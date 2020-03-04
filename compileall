@@ -1,0 +1,4 @@
+#! /bin/bash
+
+
+gcc -g -Wall -std=c99 keygen.c -o keygen
