@@ -12,12 +12,21 @@
 
 #ifndef DAEMON_H
 #define DAEMON_H
+#define _POSIX_SOURCE
 
 struct server;
 
-
+struct server *getServer();
 int checkInput(char *port);
-void setUpAddress(struct server *bg);
-void setUpSocket(struct server *bg);
+void setUpAddress(struct server *bg, char *port);
+void setUpSocket(struct server *bg, int numOfConnections);
+int acceptConnection(struct server *bg);
+void closeServer(struct server *bg);
+void sendMsg(struct server *bg, char *msg);
+void recvMsg(struct server *bg, char *completeMsg);
+void secureTransfer(char map[], int size, char *text, char *key, char *secureText, int option);
+void createLetterMap(char map[], int size);
+int getLetterLocation(int value, char map[], int size);
+void disconnect(struct server *bg);
 
 #endif
