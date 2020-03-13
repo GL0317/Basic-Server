@@ -64,7 +64,6 @@ void sendMsg(struct clientServer *client, char *msg) {
     do {
         // check the send buffer for this socket
         ioctl(client->socketFD, TIOCOUTQ, &checkSend);
-/////        printf("CLIENT(58)checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
     } while (checkSend > 0);
     // check for an error
     if (checkSend < 0) {
@@ -101,7 +100,6 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
         result = recv(client->socketFD, reader, sizeof(reader) - 1, 0);
         // add that chunk to the complete message
         strcat(completeMsg, reader);
-        /*** printf("CLIENT(80): mesage received from SERVER: \"%s\", total: \"%s\"\n", reader, completeMsg); ****/
         total += result;
         // check for errors
         if (result == -1) {
@@ -110,11 +108,6 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
         }
         if (result == 0) break;
     }
-    // find terminal location
-/////    location = strstr(completeMsg, "\n") - completeMsg;
-    // wipe out terminal with '\0'
-///////    printf("CLIENT(91) recvMSg() - location = %d\n", location); /////////////////////////////////////////////////////
-//////    completeMsg[location] = '\0';
 }
 
 

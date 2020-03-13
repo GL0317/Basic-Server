@@ -79,23 +79,12 @@ int getLetterLocation(char value, char map[], int size) {
     int location = -1;
     int index = 0;
 
-    // printf("SERVER: search value = %c\n", value);
     while (index < size && location == -1) {
-    // printf("SERVER: inside map index %d = %c\n", index, map[index]);
-
         if (value == map[index]) {
             location = index;
         }
         ++index;
     } 
-//     printf("SERVER: search value = %c\n", value);
-//    for (int i = 0; i < size; ++i) {
-//        if (value == map[i]) {
-//            location = i;
-//     printf("SERVER(71): inside map found index %d = %c\n", location, map[location]);
-///            break;
-///        }
-///    }
     return location;
 }
 
@@ -125,9 +114,6 @@ void secureTransfer(char map[], int size, char *text, char *key, char *secureTex
         // add results to secure text
         secureText[i] = map[index];
     }
-    // add a newline at the end as a delimiter for send() and recv()
-//////////////////////////////////////////////////    secureText[textSize] = '\n';
-////    printf("SERVER(106): securetext = %s\n", secureText);
 }
 
 
@@ -144,7 +130,6 @@ void recvMsg(struct server *bg, char *completeMsg, int size) {
         result = recv(bg->establishedConnectionFD, reader, sizeof(reader) - 1, 0);
         // add that chunk to the complete message
         strcat(completeMsg, reader);
-        /*** printf("CLIENT: mesage received from SERVER: \"%s\", total: \"%s\"\n", reader, completeMsg); ****/
         total += result;
         // check for errors
         if (result == -1) {
@@ -153,11 +138,6 @@ void recvMsg(struct server *bg, char *completeMsg, int size) {
         }
         if (result == 0) break;
     }
-/*    // find terminal location
-    location = strstr(completeMsg, "\n") - completeMsg;
-    // wipe out terminal with '\0'
-    printf("SERVER(133) recvMSg() - location = %d\n", location); /////////////////////////////////////////////////////
-    completeMsg[location] = '\0'; */
 }
 
 
@@ -174,7 +154,6 @@ void sendMsg(struct server *bg, char *msg) {
     do {
         // check the send buffer for this socket
         ioctl(bg->establishedConnectionFD, TIOCOUTQ, &checkSend);
-////////////        printf("SERVER(151) checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
     } while (checkSend > 0);
     // check for an error
     if (checkSend < 0) {
