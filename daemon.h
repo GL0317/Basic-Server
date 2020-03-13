@@ -23,10 +23,12 @@ void setUpSocket(struct server *bg, int numOfConnections);
 int acceptConnection(struct server *bg);
 void closeServer(struct server *bg);
 void sendMsg(struct server *bg, char *msg);
-void recvMsg(struct server *bg, char *completeMsg);
+void recvMsg(struct server *bg, char *completeMsg, int size);
 void secureTransfer(char map[], int size, char *text, char *key, char *secureText, int option);
 void createLetterMap(char map[], int size);
 int getLetterLocation(int value, char map[], int size);
 void disconnect(struct server *bg);
+void changeToString(int num, char *strNum, int size);
+int recvSize(struct server *bg);
 
 #endif

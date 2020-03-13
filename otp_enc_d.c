@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-const int MAX = 7500;
+const int MAX = 70500;
 
 int main(int argc, char **argv) {
     struct server *encD = getServer();
@@ -24,12 +24,14 @@ int main(int argc, char **argv) {
     char ciphertext[MAX];
     int mapSize = 27;
     char secretMap[mapSize];
-    int insertNewLine = -1;
+    int insertNewLine = -1, textSize = -1;
+    char strSize[6];
 
     // initalize the secret map
     createLetterMap(secretMap, mapSize);
     memset(mykey, '\0', MAX);
     memset(plaintext, '\0', MAX);
+    memset(strSize, '\0', 6);
     if (checkInput(argv[1])) {
         // setup the address struct for the server
         setUpAddress(encD, argv[1]);
@@ -38,22 +40,37 @@ int main(int argc, char **argv) {
         while(1) {
             // accept a connection, blocking if one is not available until one connects
             if (acceptConnection(encD)) {
+                // send size of server name
+                textSize = strlen("otp_enc_d");
+                changeToString(textSize, strSize, 6);
+                sendMsg(encD, strSize);
                 // send server name to client
-                sendMsg(encD, "otp_enc_d\n");
+                sendMsg(encD, "otp_enc_d");
+                // receive size of key
+                textSize = recvSize(encD);
+                printf("OTP_ENC_D(51) size of key = %d\n", textSize); ///////////////
                 // receive the key from otp_enc
-                recvMsg(encD, mykey);
-        /***/ printf("Received the key from CLIENT: %s\n", mykey);
+                recvMsg(encD, mykey, textSize);
+    /////     printf("SERVER(54) Received the key from CLIENT: %s\n", mykey); /////////////////////
+                // receive size from plaintext
+                textSize = recvSize(encD);
+                printf("OTP_ENC_D(57) size of plaintext = %d\n", textSize); ///////////////
                 // receive the plaintext from otp_enc
-                recvMsg(encD, plaintext);
-        /***/ printf("Received the plaintext from CLIENT: %s\n", plaintext);
+                recvMsg(encD, plaintext, textSize);
+   ////     printf("SERVER(53) Received the plaintext from CLIENT: %s\n", plaintext);  ///////////////////////////
                 // encrypt the data
                 memset(ciphertext, '\0', MAX);
                 secureTransfer(secretMap, mapSize, plaintext, mykey, ciphertext, 0);
                 // add a new line character to ciphertext as a delimiter
-                printf("SERVER(53) this is ciphertext: %s\n", ciphertext);
-                insertNewLine = strlen(ciphertext);
-                ciphertext[insertNewLine] = '\n';
-                printf("SERVER(55) There must be a new line after this: %s", ciphertext);
+//                printf("SERVER(53) this is ciphertext: %s\n", ciphertext);
+//                insertNewLine = strlen(ciphertext);
+//                ciphertext[insertNewLine] = '\n';
+//                printf("SERVER(55) There must be a new line after this: %s", ciphertext);
+                // send size of ciphertext
+                textSize = strlen(ciphertext);
+                changeToString(textSize, strSize, 6);
+                sendMsg(encD, strSize);
+                printf("SERVER(73) daemon just sent ciphertext size = %s\n", strSize);
                 // send ciphertext to otp_enc
                 sendMsg(encD, ciphertext);
 ////                sendMsg(encD, "ABCDE\n");

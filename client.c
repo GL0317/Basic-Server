@@ -23,7 +23,7 @@
 #include <sys/ioctl.h>
 
 
-const int STR_MAX = 7500;
+const int STR_MAX = 70500;
 
 struct clientServer {
     struct sockaddr_in serverAddress;
@@ -31,6 +31,15 @@ struct clientServer {
     int socketFD;
     int port;
 };
+
+
+void changeToString(int num, char *strNum, int size) {
+    int flag = -2;
+    flag = snprintf(strNum, size, "%d", num);
+    if (!flag) {
+        fprintf(stderr, "SERVER: error cannot convert number to string.\n");
+    }
+}
 
 
 int getPortNumber(struct clientServer *client){
@@ -52,25 +61,40 @@ void sendMsg(struct clientServer *client, char *msg) {
     if (written < 0) {
         fprintf(stderr, "CLIENT: error writing to socket\n");
     }
-//    do {
+    do {
         // check the send buffer for this socket
-//        ioctl(client->socketFD, TIOCOUTQ, &checkSend);
-//        printf("CLIENT(58)checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
-//    } while (checkSend > 0);
+        ioctl(client->socketFD, TIOCOUTQ, &checkSend);
+/////        printf("CLIENT(58)checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
+    } while (checkSend > 0);
     // check for an error
-//    if (checkSend < 0) {
-//        fprintf(stderr, "SERVER: ioctl error.\n");
-//    }
+    if (checkSend < 0) {
+        fprintf(stderr, "SERVER: ioctl error.\n");
+    }
+}
+
+int recvSize(struct clientServer *client) {
+    char reader[10];
+    int result, flag;
+
+    memset(reader, '\0', 10);
+    flag = recv(client->socketFD, reader, sizeof(reader)-1, 0);
+    if (flag < strlen(reader)) {
+        fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
+    }
+    // change string to integer
+    result = atoi(reader);
+    return result;
 }
 
 
-void recvMsg(struct clientServer *client, char *completeMsg) {
-    char reader[10];
-    int result, location;
+void recvMsg(struct clientServer *client, char *completeMsg, int size) {
+    //char reader[10];
+    char reader[size];
+    int result, total = 0;
 
     // clear the message
     memset(completeMsg, '\0', sizeof(completeMsg));
-    while (strstr(completeMsg, "\n") == NULL) {
+    while (total < size) {
         // clear the reader
         memset(reader, '\0', sizeof(reader));
         // get the next chunk
@@ -78,6 +102,7 @@ void recvMsg(struct clientServer *client, char *completeMsg) {
         // add that chunk to the complete message
         strcat(completeMsg, reader);
         /*** printf("CLIENT(80): mesage received from SERVER: \"%s\", total: \"%s\"\n", reader, completeMsg); ****/
+        total += result;
         // check for errors
         if (result == -1) {
             fprintf(stderr, "CLIENT: Error receiving message.\n");
@@ -86,10 +111,10 @@ void recvMsg(struct clientServer *client, char *completeMsg) {
         if (result == 0) break;
     }
     // find terminal location
-    location = strstr(completeMsg, "\n") - completeMsg;
+/////    location = strstr(completeMsg, "\n") - completeMsg;
     // wipe out terminal with '\0'
-    printf("CLIENT(91) recvMSg() - location = %d\n", location); /////////////////////////////////////////////////////
-    completeMsg[location] = '\0';
+///////    printf("CLIENT(91) recvMSg() - location = %d\n", location); /////////////////////////////////////////////////////
+//////    completeMsg[location] = '\0';
 }
 
 
@@ -160,9 +185,10 @@ int checkInput(char *text, char *key, char *port, int arg) {
     int textSize = 0;
     int portSize = 0;
     int min = 65, max = 90;
+    int lowercaseMin = 97, lowercaseMax = 122;
     if (text && key && port) {
-        keySize = strlen(key) - 1;
-        textSize = strlen(text) - 1;
+        keySize = strlen(key);
+        textSize = strlen(text);
         portSize = strlen(port);
     } else {
         fprintf(stderr, "CLIENT: Error, missing argument\n");
@@ -182,13 +208,27 @@ int checkInput(char *text, char *key, char *port, int arg) {
     }
     // Check for bad characters in key
     for (int i = 0; i < keySize; ++i) {
-        if (key[i] < min || key[i] > max) {
+        // remove the new line character
+        if (key[i] == '\n') {
+            key[i] = '\0';
+        } else if (key[i] < min || key[i] > max) {
             if (key[i] != 32) {
                 fprintf(stderr, "CLIENT: Error, bad character in key: %c\n", key[i]);
                 return flag;
             }
         }
-    } 
+        // check plaintext, make sure it's all in caps
+        if (i < textSize) {
+            if (text[i] >= lowercaseMin && text[i] <= lowercaseMax) {
+                fprintf(stderr, "CLIENT: Error, lower case character in plaintext: %c\n", text[i]);
+                return flag;
+            }
+            if (text[i] == '\n') {
+                text[i] = '\0';
+            }
+        }
+    }
+
     flag = 1;
     return flag;
 }

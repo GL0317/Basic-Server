@@ -31,8 +31,32 @@ struct server {
 };
 
 
+int recvSize(struct server *bg) {
+    char reader[10];
+    int result, flag;
+
+    memset(reader, '\0', 10);
+    flag = recv(bg->establishedConnectionFD, reader, sizeof(reader)-1, 0);
+    if (flag < strlen(reader)) {
+        fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
+    }
+    // change string to integer
+    result = atoi(reader);
+    return result;
+}
+
+
 void disconnect(struct server *bg) {
     close(bg->establishedConnectionFD);
+}
+
+
+void changeToString(int num, char *strNum, int size) {
+    int flag = -2;
+    flag = snprintf(strNum, size, "%d", num);
+    if (!flag) {
+        fprintf(stderr, "SERVER: error cannot convert number to string.\n");
+    }
 }
 
 
@@ -68,7 +92,7 @@ int getLetterLocation(char value, char map[], int size) {
 //    for (int i = 0; i < size; ++i) {
 //        if (value == map[i]) {
 //            location = i;
-     printf("SERVER(71): inside map found index %d = %c\n", location, map[location]);
+//     printf("SERVER(71): inside map found index %d = %c\n", location, map[location]);
 ///            break;
 ///        }
 ///    }
@@ -103,17 +127,17 @@ void secureTransfer(char map[], int size, char *text, char *key, char *secureTex
     }
     // add a newline at the end as a delimiter for send() and recv()
 //////////////////////////////////////////////////    secureText[textSize] = '\n';
-    printf("SERVER(106): securetext = %s\n", secureText);
+////    printf("SERVER(106): securetext = %s\n", secureText);
 }
 
 
-void recvMsg(struct server *bg, char *completeMsg) {
-    char reader[10];
-    int result, location;
+void recvMsg(struct server *bg, char *completeMsg, int size) {
+    char reader[size];
+    int result, total = 0;
 
     // clear the message
     memset(completeMsg, '\0', sizeof(completeMsg));
-    while (strstr(completeMsg, "\n") == NULL) {
+    while (total < size) {
         // clear the reader
         memset(reader, '\0', sizeof(reader));
         // get the next chunk
@@ -121,6 +145,7 @@ void recvMsg(struct server *bg, char *completeMsg) {
         // add that chunk to the complete message
         strcat(completeMsg, reader);
         /*** printf("CLIENT: mesage received from SERVER: \"%s\", total: \"%s\"\n", reader, completeMsg); ****/
+        total += result;
         // check for errors
         if (result == -1) {
             fprintf(stderr, "SERVER: Error receiving message.\n");
@@ -128,11 +153,11 @@ void recvMsg(struct server *bg, char *completeMsg) {
         }
         if (result == 0) break;
     }
-    // find terminal location
+/*    // find terminal location
     location = strstr(completeMsg, "\n") - completeMsg;
     // wipe out terminal with '\0'
     printf("SERVER(133) recvMSg() - location = %d\n", location); /////////////////////////////////////////////////////
-    completeMsg[location] = '\0';
+    completeMsg[location] = '\0'; */
 }
 
 
@@ -146,15 +171,15 @@ void sendMsg(struct server *bg, char *msg) {
         fprintf(stderr, "SERVER: error writing to socket\n");
         close(bg->establishedConnectionFD);
     }
-//    do {
-//        // check the send buffer for this socket
-//        ioctl(bg->establishedConnectionFD, TIOCOUTQ, &checkSend);
-//        printf("SERVER(151) checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
-//    } while (checkSend > 0);
+    do {
+        // check the send buffer for this socket
+        ioctl(bg->establishedConnectionFD, TIOCOUTQ, &checkSend);
+////////////        printf("SERVER(151) checksend: %d\n", checkSend); /* DELETE WHEN WORKING */
+    } while (checkSend > 0);
     // check for an error
-//    if (checkSend < 0) {
-//        fprintf(stderr, "SERVER: ioctl error.\n");
-//    }
+    if (checkSend < 0) {
+        fprintf(stderr, "SERVER: ioctl error.\n");
+    }
 }
 
 

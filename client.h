@@ -22,10 +22,12 @@ void readFile(char *filepath, char *text);
 int checkInput(char *text, char *key, char *port, int arg);
 void setUpAddress(struct clientServer *client, char *port, char *hostname);
 void setUpConnect(struct clientServer *client);
-void recvMsg(struct clientServer *client, char *completeMsg);
+void recvMsg(struct clientServer *client, char *completeMsg, int size);
 void closeClient(struct clientServer *client);
 void sendMsg(struct clientServer *client, char *msg);
 int getPortNumber(struct clientServer *client);
+int recvSize(struct clientServer *client);
+void changeToString(int num, char *strNum, int size);
 
 
 #endif
