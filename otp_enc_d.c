@@ -42,10 +42,11 @@ int main(int argc, char **argv) {
             if (acceptConnection(encD)) {
                 // send size of server name
                 textSize = strlen("otp_enc_d");
-                changeToString(textSize, strSize, 6);
-                sendMsg(encD, strSize);
+ ///               changeToString(textSize, strSize, 6);
+                sendSize(encD, textSize);
                 // send server name to client
                 sendMsg(encD, "otp_enc_d");
+ printf("--------- NOW RECEIVING MESSAGES FROM CLIENT--------\n");
                 // receive size of key
                 textSize = recvSize(encD);
     printf("server received key size = %d\n", textSize); 
@@ -62,10 +63,11 @@ int main(int argc, char **argv) {
                 // send size of ciphertext
 //                do {
                 textSize = strlen(ciphertext);
-                changeToString(textSize, strSize, 6);
-                sendMsg(encD, strSize);
+////                changeToString(textSize, strSize, 6);
+printf("Server sends ciphertext size:\n");
+                sendSize(encD, textSize);
 //                } while (textSize = 0);
-printf("Server sends ciphertext size = %d\n", textSize);
+//printf("Server sends ciphertext size = %d\n", textSize);
                 // send ciphertext to otp_enc
                 sendMsg(encD, ciphertext);
                 // close established connection with the client

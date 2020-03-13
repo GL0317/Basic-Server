@@ -71,6 +71,35 @@ void sendMsg(struct clientServer *client, char *msg) {
     }
 }
 
+void sendSize(struct clientServer *client, int size) {
+    int sent;
+
+    sent = send(client->socketFD, &size, sizeof(size), 0);
+    if (sent < 0) {
+        fprintf(stderr, "CLIENT: error writing to socket\n");
+    }
+    printf("CLIENT(81) length of integer sent = %d\n", sent); ///////////////////////////////////////////
+    printf("CLIENT(82) sendSize() => size = %d\n", size);
+}
+
+
+int recvSize(struct clientServer *client) {
+    int size = 0;
+    int result, flag;
+
+    flag = recv(client->socketFD, &size, sizeof(size), 0);
+////    flag = recv(client->socketFD, &size, 4, 0);
+    if (flag < 0) {
+        fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
+    }
+    printf("CLIENT(92) length of integer received = %d\n", flag); ///////////////////////////////////////////
+    // change string to integer
+    result = size;
+    printf("CLIENT(95) recvSize(), size = %d\n", result); ///////////////////////////////////////////
+    return result;
+}
+
+/*
 int recvSize(struct clientServer *client) {
     char reader[10];
     int result, flag;
@@ -84,7 +113,7 @@ int recvSize(struct clientServer *client) {
     result = atoi(reader);
     return result;
 }
-
+*/
 
 void recvMsg(struct clientServer *client, char *completeMsg, int size) {
     //char reader[10];

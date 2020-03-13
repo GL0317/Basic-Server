@@ -30,5 +30,6 @@ int getLetterLocation(int value, char map[], int size);
 void disconnect(struct server *bg);
 void changeToString(int num, char *strNum, int size);
 int recvSize(struct server *bg);
+void sendSize(struct server *bg, int size);
 
 #endif

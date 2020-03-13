@@ -32,17 +32,46 @@ struct server {
 
 
 int recvSize(struct server *bg) {
+    int size = 0;
+    int result, flag;
+
+    flag = recv(bg->establishedConnectionFD, &size, sizeof(size), 0);
+//    flag = recv(bg->establishedConnectionFD, &size, 4, 0);
+    if (size == 0) {
+        fprintf(stderr, "SERVER: Warning not all data written to socket\n");
+    }
+    printf("SERVER(42) length of integer received = %d\n", flag); ///////////////////////////////////////////
+    // change string to integer
+    result = size;
+    printf("SERVER(44) recvSize(), size = %d\n", result); ///////////////////////////////////////////
+    return result;
+}
+
+
+/*
+int recvSize(struct server *bg) {
     char reader[10];
     int result, flag;
 
     memset(reader, '\0', 10);
     flag = recv(bg->establishedConnectionFD, reader, sizeof(reader)-1, 0);
     if (flag < strlen(reader)) {
-        fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
+        fprintf(stderr, "SERVER: Warning not all data written to socket\n");
     }
     // change string to integer
     result = atoi(reader);
     return result;
+}
+*/
+
+void sendSize(struct server *bg, int size) {
+    int sent;
+
+    sent = send(bg->establishedConnectionFD, &size, sizeof(size), 0);
+    if (sent < 0) {
+        fprintf(stderr, "SERVER: error writing to socket\n");
+    }
+    printf("SERVER(72) length of integer sent = %d\n", sent); ///////////////////////////////////////////
 }
 
 

@@ -28,6 +28,7 @@ void sendMsg(struct clientServer *client, char *msg);
 int getPortNumber(struct clientServer *client);
 int recvSize(struct clientServer *client);
 void changeToString(int num, char *strNum, int size);
+void sendSize(struct clientServer *client, int size);
 
 
 #endif

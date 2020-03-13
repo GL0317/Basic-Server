@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
     // get the key from file
     readFile(argv[2], mykey);
     // verify command line inputs
-        textSize = strlen(mykey);
     if (checkInput(plaintext, mykey, argv[3], argc)) {
         // setup the server address struct
         setUpAddress(enc, argv[3], "localhost");
@@ -50,18 +49,23 @@ int main(int argc, char **argv) {
             closeClient(enc);
             exit(2);
         }
+ printf("--------- NOW SENDING MESSAGES --------\n");
         // send key size
         textSize = strlen(mykey);
-        changeToString(textSize, strSize, 6);
-        sendMsg(enc, strSize);
-printf("client send key size = %s\n", strSize); 
+///        changeToString(textSize, strSize, 6);
+printf("client send key size:\n"); 
+        sendSize(enc, textSize);
+//printf("client send key size = %d\n", textSize); 
         // send the key
         sendMsg(enc, mykey);
         // send plaintext size
         textSize = strlen(plaintext);
-        changeToString(textSize, strSize, 6);
-        sendMsg(enc, strSize);
-printf("client send plaintext size = %s\n", strSize); 
+////        int plainSize = strlen(plaintext);
+////        changeToString(textSize, strSize, 6);
+printf("client send plaintext size:\n"); 
+        sendSize(enc, textSize);
+////        sendSize(enc, plainSize);
+///printf("client send plaintext size = %d\n", textSize); 
         // send the plaintext
         sendMsg(enc, plaintext);
         // receive the size of the ciphertext
