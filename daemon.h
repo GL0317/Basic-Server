@@ -13,8 +13,13 @@
 #ifndef DAEMON_H
 #define DAEMON_H
 #define _POSIX_SOURCE
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 struct server;
+const int PROCESS;
 
 struct server *getServer();
 int checkInput(char *port);

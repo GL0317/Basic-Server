@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
-#include <strings.h>
 
 
 const int STR_MAX = 70500;
@@ -60,14 +59,12 @@ void sendMsg(struct clientServer *client, char *msg) {
 
     // send message to client
     written = send(client->socketFD, msg, strlen(msg), 0);
-printf("CLIENT(63): written message size = %d\n", written); 
     if (written < 0) {
         fprintf(stderr, "CLIENT: error writing to socket\n");
     }
     do {
         // check the send buffer for this socket
         ioctl(client->socketFD, TIOCOUTQ, &checkSend);
-////printf("client.c:checkSend = %d\n", checkSend); 
     } while (checkSend > 0);
     // check for an error
     if (checkSend < 0) {
@@ -83,8 +80,6 @@ void sendSize(struct clientServer *client, int size) {
     if (sent < 0) {
         fprintf(stderr, "CLIENT: error writing to socket\n");
     }
-printf("CLIENT(86) size of integer sent = %d\n", sent); ////////////////////////////////////
-printf("CLIENT(87) sendSize() => value = %d\n", ntohl(num));
 }
 
 
@@ -97,28 +92,11 @@ int recvSize(struct clientServer *client) {
     if (flag < sizeof(uint32_t)) {
         fprintf(stderr, "CLIENT: Warning did not receive all of data\n");
     }
-printf("CLIENT(100) size of integer received = %d\n", flag); ///////////////////////////////
     // change string to integer
     result = ntohl(num);
-printf("CLIENT(103) recvSize(), value = %d\n", result); ///////////////////////////////////////////
     return result;
 }
 
-/*
-int recvSize(struct clientServer *client) {
-    char reader[10];
-    int result, flag;
-
-    memset(reader, '\0', 10);
-    flag = recv(client->socketFD, reader, sizeof(reader)-1, 0);
-    if (flag < strlen(reader)) {
-        fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
-    }
-    // change string to integer
-    result = atoi(reader);
-    return result;
-}
-*/
 
 void recvMsg(struct clientServer *client, char *completeMsg, int size) {
     int buffer; 
@@ -153,7 +131,6 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
         }
         if (result == 0) break;
     }
-////    bzero(reader, buffer);
 }
 
 

@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
-#include <strings.h>
 
 
 struct server {
@@ -42,29 +41,11 @@ int recvSize(struct server *bg) {
     if (flag < sizeof(uint32_t)) {
         fprintf(stderr, "SERVER: Warning not all size is received\n");
     }
-printf("SERVER(45) size of integer received = %d\n", flag); ///////////////////////////////////////////
     // change string to integer
     result =ntohl(num);
-printf("SERVER(48) recvSize(), value = %d\n", result); ///////////////////////////////////////////
     return result;
 }
 
-
-/*
-int recvSize(struct server *bg) {
-    char reader[10];
-    int result, flag;
-
-    memset(reader, '\0', 10);
-    flag = recv(bg->establishedConnectionFD, reader, sizeof(reader)-1, 0);
-    if (flag < strlen(reader)) {
-        fprintf(stderr, "SERVER: Warning not all data written to socket\n");
-    }
-    // change string to integer
-    result = atoi(reader);
-    return result;
-}
-*/
 
 
 void sendSize(struct server *bg, int size) {
@@ -75,8 +56,6 @@ void sendSize(struct server *bg, int size) {
     if (sent < 0) {
         fprintf(stderr, "SERVER: error writing to socket\n");
     }
-printf("SERVER(78) size of integer sent = %d\n", sent); ///////////////////////////////////////////
-printf("SERVER(79) sending value = %d\n", ntohl(num)); ///////////////////////////////////////////
 }
 
 
@@ -153,7 +132,6 @@ void secureTransfer(char map[], int size, char *text, char *key, char *secureTex
 
 void recvMsg(struct server *bg, char *completeMsg, int size) {
     int buffer;
-///    char reader[buffer];
     int result, diff, adjust = 10;
     int total = 0, copySize = size;
 
@@ -183,9 +161,6 @@ void recvMsg(struct server *bg, char *completeMsg, int size) {
         }
         if (result == 0) break;
     }
-printf("SERVER(184) received message size = %d\n", total);
-/// printf("daemon.c FINAL STRING = %s\n", completeMsg);
-///    bzero(reader, buffer);
 }
 
 
@@ -195,7 +170,6 @@ void sendMsg(struct server *bg, char *msg) {
 
     // send message to server
     written = send(bg->establishedConnectionFD, msg, strlen(msg), 0);
-printf("SERVER(196) written = %d\n", written); 
     if (written < 0) {
         fprintf(stderr, "SERVER: error writing to socket\n");
         close(bg->establishedConnectionFD);
@@ -203,7 +177,6 @@ printf("SERVER(196) written = %d\n", written);
     do {
         // check the send buffer for this socket
         ioctl(bg->establishedConnectionFD, TIOCOUTQ, &checkSend);
-////printf("daemon.c:checkSend = %d\n", checkSend); 
     } while (checkSend > 0);
     // check for an error
     if (checkSend < 0) {
@@ -227,7 +200,7 @@ int acceptConnection(struct server *bg) {
         fprintf(stderr, "SERVER: Error on accept.\n");
         return 0;
     }
-    printf("SERVER: Connected to client at port %d\n", ntohs(bg->clientAddress.sin_port));
+    printf("SERVER(203): Connected to client at port %d\n", ntohs(bg->clientAddress.sin_port));
     return 1;
 }
 
