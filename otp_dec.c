@@ -44,29 +44,28 @@ int main(int argc, char **argv) {
         textSize = recvSize(enc);
         // receive the name of the server, and verify its otp_enc_d
         recvMsg(enc, serverName, textSize);
+        printf("daemon name: %s\n", serverName);
         if (strcmp(serverName, "otp_dec_d") != 0) {
             fprintf(stderr, "Error could not contact otp_dec_d on port %d\n", getPortNumber(enc));
             closeClient(enc);
             exit(2);
         }
-// printf("--------- NOW SENDING MESSAGES --------\n");
+printf("***** SENDING THE KEY ****\n"); 
         // send key size
         textSize = strlen(mykey);
-///        changeToString(textSize, strSize, 6);
-//printf("client send key size:\n"); 
         sendSize(enc, textSize);
-//printf("client send key size = %d\n", textSize); 
+printf("client send key size = %d\n", textSize); 
         // send the key
         sendMsg(enc, mykey);
+printf("***** SENDING THE CIPHERTEXT ****\n"); 
         // send ciphertext size
         textSize = strlen(ciphertext);
-////        changeToString(textSize, strSize, 6);
-//printf("client send plaintext size:\n"); 
         sendSize(enc, textSize);
-///printf("client send plaintext size = %d\n", textSize); 
+printf("client send ciphertext size = %d\n", textSize); 
         // send the ciphertext
         sendMsg(enc, ciphertext);
         // receive the size of the plaintext
+printf("***** RECEIVING THE PLAINTEXT ****\n"); 
         textSize = recvSize(enc);
 printf("Client received plaintext size = %d\n", textSize);
         // receive the plaintext

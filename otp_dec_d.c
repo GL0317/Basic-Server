@@ -42,33 +42,30 @@ int main(int argc, char **argv) {
                 memset(strSize, '\0', 6);
                 // send size of server name
                 textSize = strlen("otp_dec_d");
- ///               changeToString(textSize, strSize, 6);
                 sendSize(encD, textSize);
 printf("Server sends otp_dec_d size = %d\n", textSize);
                 // send server name to client
                 sendMsg(encD, "otp_dec_d");
-// printf("--------- NOW RECEIVING MESSAGES FROM CLIENT--------\n");
+printf("***** RECEIVING THE KEY ****\n"); 
                 // receive size of key
                 textSize = recvSize(encD);
-//    printf("server received key size = %d\n", textSize); 
+printf("\tserver received key size = %d\n", textSize); 
                 // receive the key from otp_dec
                 recvMsg(encD, mykey, textSize);
+printf("***** RECEIVING THE CIPHERTEXT ****\n"); 
                 // receive size from ciphertext
                 textSize = recvSize(encD);
-//    printf("server received plaintext size = %d\n", textSize); 
+printf("\tserver received ciphertext size = %d\n", textSize); 
                 // receive the ciphertext from otp_dec
                 recvMsg(encD, ciphertext, textSize);
                 // decrypt the data
                 memset(plaintext, '\0', MAX);
                 secureTransfer(secretMap, mapSize, ciphertext, mykey, plaintext, 1);
+printf("***** SENDING THE PLAINTEXT ****\n"); 
                 // send size of plaintext
-//                do {
                 textSize = strlen(plaintext);
-////                changeToString(textSize, strSize, 6);
-//printf("Server sends ciphertext size:\n");
                 sendSize(encD, textSize);
-//                } while (textSize = 0);
-printf("Server sends plaintext size = %d\n", textSize);
+printf("\tServer sends plaintext size = %d\n", textSize);
                 // send plaintext to otp_enc
                 sendMsg(encD, plaintext);
                 // close established connection with the client
