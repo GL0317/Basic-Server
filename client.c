@@ -21,6 +21,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <strings.h>
 
 
 const int STR_MAX = 70500;
@@ -58,12 +60,14 @@ void sendMsg(struct clientServer *client, char *msg) {
 
     // send message to client
     written = send(client->socketFD, msg, strlen(msg), 0);
+/////printf("client.c: written message size = %d\n", written); 
     if (written < 0) {
         fprintf(stderr, "CLIENT: error writing to socket\n");
     }
     do {
         // check the send buffer for this socket
         ioctl(client->socketFD, TIOCOUTQ, &checkSend);
+////printf("client.c:checkSend = %d\n", checkSend); 
     } while (checkSend > 0);
     // check for an error
     if (checkSend < 0) {
@@ -74,12 +78,13 @@ void sendMsg(struct clientServer *client, char *msg) {
 void sendSize(struct clientServer *client, int size) {
     int sent;
 
-    sent = send(client->socketFD, &size, sizeof(size), 0);
+    uint32_t num = htonl(size);
+    sent = send(client->socketFD, &num, sizeof(uint32_t), 0);
     if (sent < 0) {
         fprintf(stderr, "CLIENT: error writing to socket\n");
     }
-    printf("CLIENT(81) length of integer sent = %d\n", sent); ///////////////////////////////////////////
-    printf("CLIENT(82) sendSize() => size = %d\n", size);
+////    printf("CLIENT(81) size of integer sent = %d\n", sent); ////////////////////////////////////
+////    printf("CLIENT(82) sendSize() => value = %d\n", ntohl(num));
 }
 
 
@@ -87,15 +92,16 @@ int recvSize(struct clientServer *client) {
     int size = 0;
     int result, flag;
 
-    flag = recv(client->socketFD, &size, sizeof(size), 0);
+    uint32_t num = htonl(size);
+    flag = recv(client->socketFD, &num, sizeof(uint32_t), 0);
 ////    flag = recv(client->socketFD, &size, 4, 0);
-    if (flag < 0) {
+    if (flag < sizeof(uint32_t)) {
         fprintf(stderr, "CLIENT: Warning not all data written to socket\n");
     }
-    printf("CLIENT(92) length of integer received = %d\n", flag); ///////////////////////////////////////////
+///    printf("CLIENT(92) size of integer received = %d\n", flag); ///////////////////////////////
     // change string to integer
-    result = size;
-    printf("CLIENT(95) recvSize(), size = %d\n", result); ///////////////////////////////////////////
+    result =ntohl(num);
+////    printf("CLIENT(95) recvSize(), value = %d\n", result); ///////////////////////////////////////////
     return result;
 }
 
@@ -116,15 +122,16 @@ int recvSize(struct clientServer *client) {
 */
 
 void recvMsg(struct clientServer *client, char *completeMsg, int size) {
-    //char reader[10];
-    char reader[size];
+    char reader[10];
+    //char reader[size];
     int result, total = 0;
 
     // clear the message
     memset(completeMsg, '\0', sizeof(completeMsg));
     while (total < size) {
         // clear the reader
-        memset(reader, '\0', sizeof(reader));
+//        memset(reader, '\0', sizeof(reader));
+        bzero(reader, 10);
         // get the next chunk
         result = recv(client->socketFD, reader, sizeof(reader) - 1, 0);
         // add that chunk to the complete message
@@ -137,6 +144,7 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
         }
         if (result == 0) break;
     }
+    bzero(reader, 10);
 }
 
 

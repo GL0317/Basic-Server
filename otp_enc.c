@@ -49,28 +49,26 @@ int main(int argc, char **argv) {
             closeClient(enc);
             exit(2);
         }
- printf("--------- NOW SENDING MESSAGES --------\n");
+// printf("--------- NOW SENDING MESSAGES --------\n");
         // send key size
         textSize = strlen(mykey);
 ///        changeToString(textSize, strSize, 6);
-printf("client send key size:\n"); 
+//printf("client send key size:\n"); 
         sendSize(enc, textSize);
 //printf("client send key size = %d\n", textSize); 
         // send the key
         sendMsg(enc, mykey);
         // send plaintext size
         textSize = strlen(plaintext);
-////        int plainSize = strlen(plaintext);
 ////        changeToString(textSize, strSize, 6);
-printf("client send plaintext size:\n"); 
+//printf("client send plaintext size:\n"); 
         sendSize(enc, textSize);
-////        sendSize(enc, plainSize);
 ///printf("client send plaintext size = %d\n", textSize); 
         // send the plaintext
         sendMsg(enc, plaintext);
         // receive the size of the ciphertext
         textSize = recvSize(enc);
-printf("Client received ciphertext size = %d\n", textSize);
+//printf("Client received ciphertext size = %d\n", textSize);
         // receive the ciphertext
         recvMsg(enc, ciphertext, textSize);
         // close the socket

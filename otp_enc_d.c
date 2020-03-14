@@ -29,9 +29,6 @@ int main(int argc, char **argv) {
 
     // initalize the secret map
     createLetterMap(secretMap, mapSize);
-    memset(mykey, '\0', MAX);
-    memset(plaintext, '\0', MAX);
-    memset(strSize, '\0', 6);
     if (checkInput(argv[1])) {
         // setup the address struct for the server
         setUpAddress(encD, argv[1]);
@@ -40,21 +37,24 @@ int main(int argc, char **argv) {
         while(1) {
             // accept a connection, blocking if one is not available until one connects
             if (acceptConnection(encD)) {
+    memset(mykey, '\0', MAX);
+    memset(plaintext, '\0', MAX);
+    memset(strSize, '\0', 6);
                 // send size of server name
                 textSize = strlen("otp_enc_d");
  ///               changeToString(textSize, strSize, 6);
                 sendSize(encD, textSize);
                 // send server name to client
                 sendMsg(encD, "otp_enc_d");
- printf("--------- NOW RECEIVING MESSAGES FROM CLIENT--------\n");
+// printf("--------- NOW RECEIVING MESSAGES FROM CLIENT--------\n");
                 // receive size of key
                 textSize = recvSize(encD);
-    printf("server received key size = %d\n", textSize); 
+//    printf("server received key size = %d\n", textSize); 
                 // receive the key from otp_enc
                 recvMsg(encD, mykey, textSize);
                 // receive size from plaintext
                 textSize = recvSize(encD);
-    printf("server received plaintext size = %d\n", textSize); 
+//    printf("server received plaintext size = %d\n", textSize); 
                 // receive the plaintext from otp_enc
                 recvMsg(encD, plaintext, textSize);
                 // encrypt the data
@@ -62,9 +62,9 @@ int main(int argc, char **argv) {
                 secureTransfer(secretMap, mapSize, plaintext, mykey, ciphertext, 0);
                 // send size of ciphertext
 //                do {
-                textSize = strlen(ciphertext);
+//                textSize = strlen(ciphertext);
 ////                changeToString(textSize, strSize, 6);
-printf("Server sends ciphertext size:\n");
+//printf("Server sends ciphertext size:\n");
                 sendSize(encD, textSize);
 //                } while (textSize = 0);
 //printf("Server sends ciphertext size = %d\n", textSize);
