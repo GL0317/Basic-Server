@@ -54,14 +54,14 @@ int main(int argc, char **argv) {
                         exit(1);
                         break;
                     case 0:
-                        memset(mykey, '\0', MAX);
-                        memset(plaintext, '\0', MAX);
-                        memset(strSize, '\0', 6);
                         // send size of server name
                         textSize = strlen("otp_enc_d");
                         sendSize(encD, textSize);
                         // send server name to client
                         sendMsg(encD, "otp_enc_d");
+                        memset(mykey, '\0', MAX);
+                        memset(plaintext, '\0', MAX);
+                        memset(strSize, '\0', 6);
                         // receive size of key
                         textSize = recvSize(encD);
                         // receive the key from otp_enc
