@@ -1,7 +1,9 @@
 /*filename: daemon.c
- * SYNOPSIS:
  *
  * DESCRIPTION:
+ * This file consists of operations that allow a server to act as a
+ * daemon, and connect to multiple services. This file is implemented by
+ * the otp_dec_d.c and otp_enc_d.c files.
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
@@ -32,6 +34,7 @@ struct server {
 };
 
 
+// receives the size of a string from a connected server
 int recvSize(struct server *bg) {
     int size = 0;
     int result, flag;
@@ -47,7 +50,10 @@ int recvSize(struct server *bg) {
 }
 
 
-
+/* Sends the size of a message to a server
+ *@precondition:  The message must already exists and it's length calculated
+  @postcondition: sends the integer value of size 4 bytes to the connected server
+ */
 void sendSize(struct server *bg, int size) {
     int sent;
 
@@ -59,11 +65,13 @@ void sendSize(struct server *bg, int size) {
 }
 
 
+// closes the established socket connection with a server
 void disconnect(struct server *bg) {
     close(bg->establishedConnectionFD);
 }
 
 
+// Creates a Map of characters to use as a legend to encypt and decrypt data
 void createLetterMap(char map[], int size) {
     int index = 0;
     int filler = 65;
@@ -79,6 +87,8 @@ void createLetterMap(char map[], int size) {
 }
 
 
+// Searches the map for matching characters, and returns the location
+// of that character in the map
 int getLetterLocation(char value, char map[], int size) {
     int location = -1;
     int index = 0;
@@ -93,6 +103,12 @@ int getLetterLocation(char value, char map[], int size) {
 }
 
 
+/*Performs encyption or decryption of data
+ * @precondition:  the option parameter determines how data is handled. When its 0,
+ *                the data is encypted, otherwise it's decrypted.
+ *                All strings in the parameter cannot be NULL
+ * @postcondtion:  stores encrypted or decrypted data into the secureText parameter
+ */
 void secureTransfer(char map[], int size, char *text, char *key, char *secureText, int option){
     int keylocal = -1;
     int textlocal = -1;
@@ -121,6 +137,11 @@ void secureTransfer(char map[], int size, char *text, char *key, char *secureTex
 }
 
 
+/* Receives a message from a connecting server
+ *@precondition: This function must know the size of the message that is being sent
+  @postcondition: Ensures that all the contents of the message is received 
+                  according to the size given
+ */
 void recvMsg(struct server *bg, char *completeMsg, int size) {
     int buffer;
     int result, diff, adjust = 10;
@@ -155,6 +176,11 @@ void recvMsg(struct server *bg, char *completeMsg, int size) {
 }
 
 
+/* Sends a message to a connecting server
+ *@precondition: msg cannot be null, and the client must connected to the server
+  @postcondition: Sends a message to the server, it does not verify that the server
+  received the message
+ */
 void sendMsg(struct server *bg, char *msg) {
     int checkSend = -5;
     int written;
@@ -176,12 +202,13 @@ void sendMsg(struct server *bg, char *msg) {
 }
 
 
-
+// The server stops listening for other servers to connect to
 void closeServer(struct server *bg) {
     close(bg->listenSocketFD);
 }
     
 
+// Accepts the connection to another server
 int acceptConnection(struct server *bg) {
     // get the size of the address for the client that will connect
     bg->sizeOfClientInfo = sizeof(bg->clientAddress);
@@ -195,6 +222,7 @@ int acceptConnection(struct server *bg) {
 }
 
 
+// returns the struct that contains data member needed to connect to a server
 struct server *getServer() {
     struct server *aServer = (struct server *)malloc(sizeof(struct server));
     assert(aServer != 0);
@@ -202,7 +230,7 @@ struct server *getServer() {
 }
 
 
-//
+// Sets up the server address struct
 void setUpAddress(struct server *bg, char *port) {
     int portNumber;
 
@@ -218,7 +246,7 @@ void setUpAddress(struct server *bg, char *port) {
 }
 
 
-//
+// Creates a socket and begins listening for other servers to connect to 
 void setUpSocket(struct server *bg, int numOfConnections) {
     // set up the socket
     bg->listenSocketFD = socket(AF_INET, SOCK_STREAM, 0); // create socket

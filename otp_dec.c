@@ -1,8 +1,11 @@
 /* filename: otp_dec.c
  *
  * SYNOPSIS:
+ *      otp_dec CIPHERTEXT KEY PORT
  *
  * DESCRIPTION:
+ *      This program receives the ciphertext and key as inputs sends it to a server that
+ *      performs decryption, and it receives the plaintext from that server.
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 13, 2020
@@ -35,7 +38,7 @@ int main(int argc, char **argv) {
     // get the key from file
     readFile(argv[2], mykey);
     // verify command line inputs
-    if (checkInput(ciphertext, mykey, argv[3], argc)) {
+    if (checkInput(ciphertext, mykey, argv[3])) {
         dec = getClient();
         // setup the server address struct
         setUpAddress(dec, argv[3], "localhost");

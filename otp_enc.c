@@ -1,8 +1,11 @@
 /* filename: otp_enc.c
  *
  * SYNOPSIS:
+ *      otp_enc PLAINTEXT KEY PORT
  *
  * DESCRIPTION:
+ *      This program sends the plaintext and the key to an encrypting server, and 
+ *      receives the ciphertext from that server.
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
@@ -35,7 +38,7 @@ int main(int argc, char **argv) {
     // get the key from file
     readFile(argv[2], mykey);
     // verify command line inputs
-    if (checkInput(plaintext, mykey, argv[3], argc)) {
+    if (checkInput(plaintext, mykey, argv[3])) {
         enc = getClient();
         // setup the server address struct
         setUpAddress(enc, argv[3], "localhost");

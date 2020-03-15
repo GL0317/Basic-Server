@@ -1,8 +1,10 @@
 /* filename: client.c
  *
- * SYNOPSIS:
- *
  * DESCRIPTION:
+ * This file provides functions that allows a server to act as a client.
+ * It sends the plaintext or ciphertext and a key to a server and received in 
+ * return the ciphertext of a sent plaintext or the plaintext or a sent ciphertext
+ * This file is impletemented by otp_enc.c and otp_enc.d
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
@@ -34,16 +36,23 @@ struct clientServer {
 };
 
 
+// Returns the port number the client server
 int getPortNumber(struct clientServer *client){
     return client->port;
 }
 
 
+// Wrapper function for closing a socket
 void closeClient(struct clientServer *client){
     close(client->socketFD);
 }
 
 
+/* Sends a message to a connecting server
+ *@precondition: msg cannot be null, and the client must connected to the server
+  @postcondition: Sends a message to the server, it does not verify that the server
+  received the message
+ */
 void sendMsg(struct clientServer *client, char *msg) {
     int checkSend = -5;
     int written;
@@ -64,6 +73,10 @@ void sendMsg(struct clientServer *client, char *msg) {
 }
 
 
+/* Sends the size of a message to a server
+ *@precondition:  The message must already exists and it's length calculated
+  @postcondition: sends the integer value of size 4 bytes to the connected server
+ */
 void sendSize(struct clientServer *client, int size) {
     int sent;
 
@@ -75,6 +88,7 @@ void sendSize(struct clientServer *client, int size) {
 }
 
 
+// receives the size of a string from a connected server
 int recvSize(struct clientServer *client) {
     int size = 0;
     int result, flag;
@@ -90,6 +104,11 @@ int recvSize(struct clientServer *client) {
 }
 
 
+/* Receives a message from a connecting server
+ *@precondition: This function must know the size of the message that is being sent
+  @postcondition: Ensures that all the contents of the message is received 
+                  according to the size given
+ */
 void recvMsg(struct clientServer *client, char *completeMsg, int size) {
     int buffer; 
     int result, total = 0;
@@ -117,6 +136,7 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
             fprintf(stderr, "CLIENT: Error receiving message.\n");
             break;
         }
+        // adjust the buffer so that only the exact ammount to prevent an over-read
         if (buffer > copySize) {
             diff = buffer - copySize;
             adjust = buffer - diff + 1;
@@ -126,6 +146,7 @@ void recvMsg(struct clientServer *client, char *completeMsg, int size) {
 }
 
 
+// returns the struct that contains data member needed to connect to a server
 struct clientServer *getClient() {
     struct clientServer *client = (struct clientServer *)malloc(sizeof(struct clientServer));
     assert(client != 0);
@@ -133,7 +154,7 @@ struct clientServer *getClient() {
 }
 
 
-//
+// Only reads the first line of a file and stores it the text variable
 void readFile(char *filepath, char *text) {
     FILE *reader;
 
@@ -150,7 +171,7 @@ void readFile(char *filepath, char *text) {
 }
 
 
-//
+// Sets up the socket and connects to a server
 void setUpConnect(struct clientServer *client) {
     // set up the socket
     client->socketFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -165,7 +186,7 @@ void setUpConnect(struct clientServer *client) {
 }
 
 
-//
+// Sets up the server address struct
 void setUpAddress(struct clientServer *client, char *port, char *hostname) {
     int portNumber;
 
@@ -188,13 +209,16 @@ void setUpAddress(struct clientServer *client, char *port, char *hostname) {
 }
 
 
-int checkInput(char *text, char *key, char *port, int arg) {
+// Verifies that the text and key have authorized characters.
+// It ensures that port is a number. 
+int checkInput(char *text, char *key, char *port) {
     int flag = 0;
     int keySize = 0;
     int textSize = 0;
     int portSize = 0;
     int min = 65, max = 90;
     int lowercaseMin = 97, lowercaseMax = 122;
+
     if (text && key && port) {
         keySize = strlen(key);
         textSize = strlen(text);

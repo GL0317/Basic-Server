@@ -1,8 +1,13 @@
 /* filename: otp_dec_d.c
  *
  * SYNOPSIS:
+ *      otp_dec_d PORT
  *
  * DESCRIPTION:
+ *      This program is a daemon that performs decription of data.  The daemon can service
+ *      up to five servers concurrently.  This program is ment to run continuosly as a 
+ *      background process, and it will stop running if an encrypting client attempts to
+ *      connect with it (otp_enc).
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 13, 2020

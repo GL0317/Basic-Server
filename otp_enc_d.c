@@ -1,8 +1,14 @@
 /* filename: otp_enc_d.c
  *
  * SYNOPSIS:
+ *      otp_enc_d PORT
  *
  * DESCRIPTION:
+ *      This program is a daemon that encrypts data that is sent to it from
+ *      other servers.  The program sends an encryted string to the client server.
+ *      The program first sends its name to the client server to ensure that the client
+ *      server is aware that this daemon is fro encrypting data only.  This daemon 
+ *      concurrently handles up to five client connections
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020

@@ -1,13 +1,16 @@
 /*filename: keygen.c
  *
  * SYNOPSIS:
+ *      keygen NUMBER [>] [file name]
  *
  * DESCRIPTION:
+ * This program generates a random key of strings with the length greater than NUMBER by one.
+ * The Values are chosen between A - Z and space.
+ * The program outputs the key, but the output can be redirected to a file.
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 3, 2020
  * DATE LAST MODIFIED: March 5, 2020 
- *
  */
 
 #include <stdio.h>
