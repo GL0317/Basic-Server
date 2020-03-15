@@ -1,4 +1,5 @@
 # CS344-Program4
+Author: Gerson Lindor Jr. (lindorg@oregonstate.edu)
 
 To compile the program, type on the program: 
 compileall
