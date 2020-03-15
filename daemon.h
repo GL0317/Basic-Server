@@ -5,7 +5,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5,2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 
@@ -22,7 +22,6 @@ struct server;
 const int PROCESS;
 
 struct server *getServer();
-int checkInput(char *port);
 void setUpAddress(struct server *bg, char *port);
 void setUpSocket(struct server *bg, int numOfConnections);
 int acceptConnection(struct server *bg);
@@ -33,7 +32,6 @@ void secureTransfer(char map[], int size, char *text, char *key, char *secureTex
 void createLetterMap(char map[], int size);
 int getLetterLocation(int value, char map[], int size);
 void disconnect(struct server *bg);
-void changeToString(int num, char *strNum, int size);
 int recvSize(struct server *bg);
 void sendSize(struct server *bg, int size);
 

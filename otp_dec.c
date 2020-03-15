@@ -6,7 +6,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 13, 2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 
@@ -17,7 +17,7 @@
 
 
 int main(int argc, char **argv) {
-    struct clientServer *enc = getClient();
+    struct clientServer *dec = NULL;
     char mykey[STR_MAX];
     char plaintext[STR_MAX];
     char ciphertext[STR_MAX];
@@ -36,38 +36,39 @@ int main(int argc, char **argv) {
     readFile(argv[2], mykey);
     // verify command line inputs
     if (checkInput(ciphertext, mykey, argv[3], argc)) {
+        dec = getClient();
         // setup the server address struct
-        setUpAddress(enc, argv[3], "localhost");
+        setUpAddress(dec, argv[3], "localhost");
         // setup the socket and connect to the server
-        setUpConnect(enc);
+        setUpConnect(dec);
         // receive the size of incomming text
-        textSize = recvSize(enc);
-        // receive the name of the server, and verify its otp_enc_d
-        recvMsg(enc, serverName, textSize);
-        if (strcmp(serverName, "otp_dec_d") != 0) {
-            fprintf(stderr, "Error could not contact otp_dec_d on port %d\n", getPortNumber(enc));
-            closeClient(enc);
+        textSize = recvSize(dec);
+        // receive the name of the server, and verify its otp_dec_d
+        recvMsg(dec, serverName, textSize);
+        if (!strcmp(serverName, "otp_enc_d")) {
+            fprintf(stderr, "Error otp_dec cannot use %s on port %d.\n", serverName, getPortNumber(dec));
+            closeClient(dec);
             exit(2);
         }
         // send key size
         textSize = strlen(mykey);
-        sendSize(enc, textSize);
+        sendSize(dec, textSize);
         // send the key
-        sendMsg(enc, mykey);
+        sendMsg(dec, mykey);
         // send ciphertext size
         textSize = strlen(ciphertext);
-        sendSize(enc, textSize);
+        sendSize(dec, textSize);
         // send the ciphertext
-        sendMsg(enc, ciphertext);
+        sendMsg(dec, ciphertext);
         // receive the size of the plaintext
-        textSize = recvSize(enc);
+        textSize = recvSize(dec);
         // receive the plaintext
-        recvMsg(enc, plaintext, textSize);
+        recvMsg(dec, plaintext, textSize);
         // close the socket
-        closeClient(enc);
+        closeClient(dec);
+        printf("%s\n", plaintext);
+        if (dec) { free(dec); dec = NULL; }
     }
-    printf("%s\n", plaintext);
-    if (enc) { free(enc); enc = NULL; }
     return 0;
 }
 

@@ -6,7 +6,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 #include <stdio.h>
@@ -32,15 +32,6 @@ struct clientServer {
     int socketFD;
     int port;
 };
-
-
-void changeToString(int num, char *strNum, int size) {
-    int flag = -2;
-    flag = snprintf(strNum, size, "%d", num);
-    if (!flag) {
-        fprintf(stderr, "SERVER: error cannot convert number to string.\n");
-    }
-}
 
 
 int getPortNumber(struct clientServer *client){
@@ -71,6 +62,7 @@ void sendMsg(struct clientServer *client, char *msg) {
         fprintf(stderr, "SERVER: ioctl error.\n");
     }
 }
+
 
 void sendSize(struct clientServer *client, int size) {
     int sent;
@@ -168,6 +160,7 @@ void setUpConnect(struct clientServer *client) {
     // connect to server
     if (connect(client->socketFD, (struct sockaddr*)&client->serverAddress, sizeof(client->serverAddress)) < 0) {
         fprintf(stderr, "CLIENT: ERROR connecting\n");
+        exit(1);
     }
 }
 
@@ -188,7 +181,7 @@ void setUpAddress(struct clientServer *client, char *port, char *hostname) {
     client->serverHostInfo = gethostbyname(hostname);
     if (client->serverHostInfo == NULL) {
         fprintf(stderr, "CLIENT: ERROR, no such host\n");
-        exit(0);
+        exit(1);
     }
     // copy in the address
     memcpy((char *)&client->serverAddress.sin_addr.s_addr, (char *)client->serverHostInfo->h_addr_list[0], client->serverHostInfo->h_length);
@@ -212,7 +205,7 @@ int checkInput(char *text, char *key, char *port, int arg) {
     } 
     // check if key is shorter than text, and port is a number
     if ( keySize < textSize) {
-        fprintf(stderr, "CLIENT: Error, check argument count, key size, or text size\n");
+        fprintf(stderr, "CLIENT: The key is too short\n");
         return flag;
     } 
     // verify port is a number
@@ -236,15 +229,15 @@ int checkInput(char *text, char *key, char *port, int arg) {
         // check plaintext, make sure it's all in caps
         if (i < textSize) {
             if (text[i] >= lowercaseMin && text[i] <= lowercaseMax) {
-                fprintf(stderr, "CLIENT: Error, lower case character in plaintext: %c\n", text[i]);
+                fprintf(stderr, "CLIENT: Error, bad character %c in plaintext.\n", text[i]);
                 return flag;
             }
             if (text[i] == '\n') {
                 text[i] = '\0';
-            }
+            } 
+
         }
     }
-
     flag = 1;
     return flag;
 }

@@ -5,7 +5,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 
@@ -61,15 +61,6 @@ void sendSize(struct server *bg, int size) {
 
 void disconnect(struct server *bg) {
     close(bg->establishedConnectionFD);
-}
-
-
-void changeToString(int num, char *strNum, int size) {
-    int flag = -2;
-    flag = snprintf(strNum, size, "%d", num);
-    if (!flag) {
-        fprintf(stderr, "SERVER: error cannot convert number to string.\n");
-    }
 }
 
 
@@ -200,7 +191,6 @@ int acceptConnection(struct server *bg) {
         fprintf(stderr, "SERVER: Error on accept.\n");
         return 0;
     }
-    printf("SERVER(203): Connected to client at port %d\n", ntohs(bg->clientAddress.sin_port));
     return 1;
 }
 
@@ -209,26 +199,6 @@ struct server *getServer() {
     struct server *aServer = (struct server *)malloc(sizeof(struct server));
     assert(aServer != 0);
     return aServer;
-}
-
-
-int checkInput(char *port) {
-    int flag = 1;
-    int portSize = 0;
-
-    if (!port) {
-        return 0;
-    }
-    portSize = strlen(port);
-    // verify port is a number
-    for (int i = 0; i < portSize; ++i) {
-        if (!isdigit(port[i])) {
-            fprintf(stderr, "SERVER: Error, There's a letter %c in the port number\n", port[i]);
-            flag = 0;
-            return flag;
-        }
-    }
-    return flag;
 }
 
 

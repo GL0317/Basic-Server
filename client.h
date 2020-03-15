@@ -6,7 +6,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 
@@ -27,7 +27,6 @@ void closeClient(struct clientServer *client);
 void sendMsg(struct clientServer *client, char *msg);
 int getPortNumber(struct clientServer *client);
 int recvSize(struct clientServer *client);
-void changeToString(int num, char *strNum, int size);
 void sendSize(struct clientServer *client, int size);
 
 

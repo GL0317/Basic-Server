@@ -6,7 +6,7 @@
  *
  * AUTHOR: Gerson Lindor Jr. (lindorg@oregonstate.edu)
  * DATE CREATED: March 5, 2020
- * DATE LAST MODIFIED:
+ * DATE LAST MODIFIED: March 14, 2020
  */
 
 
@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
     readFile(argv[2], mykey);
     // verify command line inputs
     if (checkInput(plaintext, mykey, argv[3], argc)) {
+        enc = getClient();
         // setup the server address struct
         setUpAddress(enc, argv[3], "localhost");
         // setup the socket and connect to the server
@@ -44,8 +45,8 @@ int main(int argc, char **argv) {
         textSize = recvSize(enc);
         // receive the name of the server, and verify its otp_enc_d
         recvMsg(enc, serverName, textSize);
-        if (strcmp(serverName, "otp_enc_d") != 0) {
-            fprintf(stderr, "Error could not contact otp_enc_d on port %d\n", getPortNumber(enc));
+        if (!strcmp(serverName, "otp_dec_d")) {
+            fprintf(stderr, "Error otp_enc cannot use %s on port %d.\n", serverName, getPortNumber(enc));
             closeClient(enc);
             exit(2);
         }
@@ -65,9 +66,9 @@ int main(int argc, char **argv) {
         recvMsg(enc, ciphertext, textSize);
         // close the socket
         closeClient(enc);
+        printf("%s\n", ciphertext);
+        if (enc) { free(enc); enc = NULL; }
     }
-    printf("%s\n", ciphertext);
-    if (enc) { free(enc); enc = NULL; }
     return 0;
 }
 
